@@ -1,0 +1,110 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(BookListApp());
+}
+
+class BookListApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Book List',
+      home: BookListScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class Book {
+  final String imageUrl;
+  final String name;
+  final String author;
+  final String price;
+
+  Book(
+      {required this.imageUrl,
+      required this.name,
+      required this.author,
+      required this.price});
+}
+
+class BookListScreen extends StatelessWidget {
+  final List<Book> books = [
+    Book(
+      imageUrl: 'https://via.placeholder.com/100',
+      name: 'Atomic Habits',
+      author: 'James Clear',
+      price: '\$15',
+    ),
+    Book(
+      imageUrl: 'https://via.placeholder.com/100',
+      name: 'The Alchemist',
+      author: 'Paulo Coelho',
+      price: '\$12',
+    ),
+    Book(
+      imageUrl: 'https://via.placeholder.com/100',
+      name: 'Ikigai',
+      author: 'Francesc Miralles',
+      price: '\$10',
+    ),
+    Book(
+      imageUrl: 'https://via.placeholder.com/100',
+      name: 'Deep Work',
+      author: 'Cal Newport',
+      price: '\$14',
+    ),
+    Book(
+      imageUrl: 'https://via.placeholder.com/100',
+      name: 'Rich Dad',
+      author: 'Robert Kiyosaki',
+      price: '\$11',
+    ),
+    Book(
+      imageUrl: 'https://via.placeholder.com/100',
+      name: 'The Power of',
+      author: 'Eckhart Tolle',
+      price: '\$13',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Book details')),
+      body: ListView.builder(
+        itemCount: books.length,
+        itemBuilder: (context, index) {
+          final book = books[index];
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.network(
+                    book.imageUrl,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(width: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Book Name: ${book.name}',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('Author: ${book.author}'),
+                      Text('Price: ${book.price}'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
