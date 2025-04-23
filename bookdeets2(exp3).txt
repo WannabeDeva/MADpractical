@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(BookDetailsApp());
+}
+
+class BookDetailsApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Book Details Form',
+      home: BookDetailsForm(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class BookDetailsForm extends StatefulWidget {
+  @override
+  _BookDetailsFormState createState() => _BookDetailsFormState();
+}
+
+class _BookDetailsFormState extends State<BookDetailsForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _subjectController = TextEditingController();
+  final _marksController = TextEditingController();
+  String? _selectedCategory;
+
+  String? _validateAlphabetOnly(String? value, String fieldName) {
+    if (value == null || value.isEmpty) return '$fieldName is required';
+    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+      return '$fieldName must contain only letters';
+    }
+    return null;
+  }
+
+  String? _validateMarks(String? value) {
+    if (value == null || value.isEmpty) return 'Marks are required';
+    final number = double.tryParse(value);
+    if (number == null) return 'Marks must be a number';
+    if (number < 0) return 'Marks cannot be negative';
+    return null;
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedCategory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select a category')),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Form Submitted Successfully!')),
+      );
+    }
+  }
+
+  Widget _buildCategoryRadio(String value, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Radio<String>(
+          value: value,
+          groupValue: _selectedCategory,
+          onChanged: (val) {
+            setState(() {
+              _selectedCategory = val!;
+            });
+          },
+        ),
+        Text(label),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Book details')),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Name'),
+                validator: (value) => _validateAlphabetOnly(value, 'Name'),
+              ),
+              TextFormField(
+                controller: _subjectController,
+                decoration: InputDecoration(labelText: 'Subject'),
+                validator: (value) => _validateAlphabetOnly(value, 'Subject'),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text('Category:'),
+                  _buildCategoryRadio('TW', 'TW'),
+                  _buildCategoryRadio('IA', 'IA'),
+                  _buildCategoryRadio('Or', 'Or'),
+                ],
+              ),
+              TextFormField(
+                controller: _marksController,
+                decoration: InputDecoration(labelText: 'Marks'),
+                keyboardType: TextInputType.number,
+                validator: _validateMarks,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: Text('Submit'),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
