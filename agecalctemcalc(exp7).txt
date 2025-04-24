@@ -1,0 +1,185 @@
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Utility App',
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: TempConverterPage(),
+    );
+  }
+}
+
+// ================== Drawer Widget ===================
+Drawer buildDrawer(BuildContext context) {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        DrawerHeader(
+          decoration: BoxDecoration(color: Colors.teal),
+          child: Text(
+            'Utility Menu',
+            style: TextStyle(color: Colors.white, fontSize: 24),
+          ),
+        ),
+        ListTile(
+          title: Text('Temperature Converter'),
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => TempConverterPage()),
+            );
+          },
+        ),
+        ListTile(
+          title: Text('Age Calculator'),
+          onTap: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => AgeCalculatorPage()),
+            );
+          },
+        ),
+      ],
+    ),
+  );
+}
+
+// ============ Page 1: Temperature Converter ============
+class TempConverterPage extends StatefulWidget {
+  @override
+  _TempConverterPageState createState() => _TempConverterPageState();
+}
+
+class _TempConverterPageState extends State<TempConverterPage> {
+  final TextEditingController tempController = TextEditingController();
+  String result = '';
+  bool isCtoF = true;
+
+  void convert() {
+    double temp = double.tryParse(tempController.text) ?? 0;
+    if (isCtoF) {
+      double f = (temp * 9 / 5) + 32;
+      result = '$temp°C = ${f.toStringAsFixed(2)}°F';
+    } else {
+      double c = (temp - 32) * 5 / 9;
+      result = '$temp°F = ${c.toStringAsFixed(2)}°C';
+    }
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Temperature Converter')),
+      drawer: buildDrawer(context),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: tempController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Enter Temperature'),
+            ),
+            SwitchListTile(
+              title: Text(
+                  isCtoF ? "Celsius to Fahrenheit" : "Fahrenheit to Celsius"),
+              value: isCtoF,
+              onChanged: (value) {
+                setState(() {
+                  isCtoF = value;
+                });
+              },
+            ),
+            ElevatedButton(onPressed: convert, child: Text("Convert")),
+            SizedBox(height: 20),
+            Text(result, style: TextStyle(fontSize: 20)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============ Page 2: Age Calculator ===================
+class AgeCalculatorPage extends StatefulWidget {
+  @override
+  _AgeCalculatorPageState createState() => _AgeCalculatorPageState();
+}
+
+class _AgeCalculatorPageState extends State<AgeCalculatorPage> {
+  DateTime? selectedDate;
+  String age = '';
+
+  void calculateAge() {
+    if (selectedDate != null) {
+      DateTime today = DateTime.now();
+      int years = today.year - selectedDate!.year;
+      if (today.month < selectedDate!.month ||
+          (today.month == selectedDate!.month &&
+              today.day < selectedDate!.day)) {
+        years--;
+      }
+      age = 'You are $years years old.';
+      setState(() {});
+    }
+  }
+
+  Future<void> pickDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Age Calculator')),
+      drawer: buildDrawer(context),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: pickDate,
+              child: Text("Pick Your Date of Birth"),
+            ),
+            if (selectedDate != null)
+              Text(
+                  'Selected: ${DateFormat('dd/MM/yyyy').format(selectedDate!)}'),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: calculateAge,
+              child: Text("Calculate Age"),
+            ),
+            SizedBox(height: 20),
+            Text(age, style: TextStyle(fontSize: 20)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+// replace the dependencies in pubspec.yaml and do flutter pub get:
+dependencies:
+  flutter:
+    sdk: flutter
+  intl: ^0.20.2
